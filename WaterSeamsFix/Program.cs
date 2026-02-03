@@ -87,9 +87,14 @@ public class Program
                 errorCount++;
             }
         }
-
+        Console.WriteLine();
+        Console.Write("Decompressing records...");
+        Console.Out.Flush();
+        
         // Decompress records
         int decompressed = DecompressRecords(state.PatchMod);
+        
+        Console.WriteLine($" done ({decompressed} records)");
 
         // Summary
         int totalPatched = patchesByMod.Values.Sum();
@@ -139,16 +144,28 @@ public class Program
         IPatcherState<ISkyrimMod, ISkyrimModGetter> state,
         Dictionary<string, int> patchesByMod)
     {
-        Console.Write($"  {modName}... ");
+        // Print mod name immediately and flush so it appears even if we hang
+        Console.Write($"  {modName}");
+        Console.Out.Flush();
         
         var modStopwatch = Stopwatch.StartNew();
         int cellCount = 0;
         int patchCount = 0;
         var slowCells = new List<string>();
+        int lastProgressReport = 0;
 
         foreach (var cellContext in mod.EnumerateMajorRecordContexts<ICell, ICellGetter>(state.LinkCache))
         {
             cellCount++;
+            
+            // Show progress every 500 cells for large mods
+            if (cellCount - lastProgressReport >= 500)
+            {
+                Console.Write($" [{cellCount}]");
+                Console.Out.Flush();
+                lastProgressReport = cellCount;
+            }
+            
             var cellTimer = Stopwatch.StartNew();
             
             try
@@ -212,14 +229,14 @@ public class Program
             patchesByMod[modName] = patchCount;
         }
 
-        // Print result
+        // Print result on same line
         if (modStopwatch.ElapsedMilliseconds > 5000)
         {
-            Console.WriteLine($"{cellCount} cells, {patchCount} patched [SLOW: {modStopwatch.ElapsedMilliseconds}ms]");
+            Console.WriteLine($"... {cellCount} cells, {patchCount} patched [SLOW: {modStopwatch.ElapsedMilliseconds}ms]");
         }
         else
         {
-            Console.WriteLine($"{cellCount} cells, {patchCount} patched");
+            Console.WriteLine($"... {cellCount} cells, {patchCount} patched");
         }
 
         // Print slow cells if any
