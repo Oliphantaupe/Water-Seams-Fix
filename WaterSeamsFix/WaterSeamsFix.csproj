@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Mutagen.Bethesda.Skyrim" Version="0.49" />
-    <PackageReference Include="Mutagen.Bethesda.Synthesis" Version="0.33.3" />
+    <PackageReference Include="Mutagen.Bethesda.Skyrim" Version="0.53.0" />
+    <PackageReference Include="Mutagen.Bethesda.Synthesis" Version="0.35.4" />
   </ItemGroup>
 </Project>
